@@ -1,0 +1,52 @@
+// AstraLabs system summary for fastfetch.
+// Run through `astralabs-fetch`, which picks the image or text logo for the terminal.
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+        "padding": { "top": 1, "left": 2, "right": 4 }
+    },
+    "display": {
+        "separator": "",
+        "color": {
+            "keys": "#b6ff2e",
+            "title": "#ede6e1",
+            "output": "#ede6e1",
+            "separator": "#2c2a29"
+        },
+        "key": { "width": 11 },
+        "bar": {
+            "char": { "elapsed": "■", "total": "■" },
+            "color": { "elapsed": "#b6ff2e", "total": "#2c2a29" },
+            "border": null,
+            "width": 12
+        },
+        "percent": {
+            "type": ["num", "bar"],
+            "color": { "green": "#ede6e1", "yellow": "#ffa21f", "red": "#ff2e3a" }
+        }
+    },
+    "modules": [
+        "break",
+        {
+            "type": "title",
+            "format": "{#1}{user-name}{#}{#38;2;182;255;46}@{#}{#1}{host-name}{#}"
+        },
+        {
+            // measurement rule: acid index segment, then a hairline
+            "type": "custom",
+            "format": "{#38;2;182;255;46}━━━━{#38;2;44;42;41}──────────────────────────────────"
+        },
+        { "type": "os", "key": "os", "format": "{pretty-name} {arch}" },
+        { "type": "kernel", "key": "kernel" },
+        { "type": "uptime", "key": "uptime" },
+        { "type": "packages", "key": "packages" },
+        { "type": "shell", "key": "shell" },
+        { "type": "de", "key": "desktop" },
+        { "type": "terminal", "key": "terminal" },
+        "break",
+        { "type": "cpu", "key": "cpu", "format": "{name} ({cores-logical})" },
+        { "type": "gpu", "key": "gpu", "format": "{name}" },
+        { "type": "memory", "key": "memory" },
+        { "type": "disk", "key": "disk", "folders": "/" }
+    ]
+}

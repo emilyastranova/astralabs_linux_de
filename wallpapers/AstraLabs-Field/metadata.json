@@ -1,0 +1,14 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Emily Astranova",
+                "Email": "emily@astralabs.dev"
+            }
+        ],
+        "Id": "AstraLabs-Field",
+        "Name": "AstraLabs Field",
+        "Description": "Dot field and registration marks",
+        "License": "AGPL-3.0"
+    }
+}

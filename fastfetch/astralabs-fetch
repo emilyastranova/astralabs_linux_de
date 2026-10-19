@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# AstraLabs system summary. Shows the real logo in terminals that can draw images
+# (Konsole, kitty, WezTerm, Ghostty) and the block-character logo everywhere else.
+#
+#   astralabs-fetch          pick automatically
+#   astralabs-fetch --text   always use the text logo
+#   astralabs-fetch --image  always use the image logo
+set -euo pipefail
+
+SHARE="${XDG_DATA_HOME:-$HOME/.local/share}/astralabs-theme/fastfetch"
+CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/fastfetch/astralabs.jsonc"
+
+mode="${1:-auto}"
+if [[ "$mode" == auto ]]; then
+  # SSH sessions and multiplexers can't pass images through reliably
+  if [[ -z "${SSH_CONNECTION:-}" && -z "${TMUX:-}" && "${TERM:-}" != screen* ]] &&
+     [[ -n "${KONSOLE_VERSION:-}" || -n "${KITTY_WINDOW_ID:-}" || "${TERM:-}" == xterm-kitty ||
+        "${TERM_PROGRAM:-}" == WezTerm || "${TERM_PROGRAM:-}" == ghostty ]]; then
+    mode=--image
+  else
+    mode=--text
+  fi
+fi
+
+# Images need the terminal's pixel size to scale; without it fastfetch swaps in the distro logo
+has_pixels() {
+  python3 -c 'import fcntl, struct, sys, termios
+r = fcntl.ioctl(sys.stdout.fileno(), termios.TIOCGWINSZ, bytes(8))
+_, _, x, y = struct.unpack("HHHH", r)
+sys.exit(0 if x and y else 1)' 2>/dev/null
+}
+[[ "$mode" == --image ]] && ! has_pixels && [[ "${1:-}" != --image ]] && mode=--text
+
+if [[ "$mode" == --image ]]; then
+  exec fastfetch -c "$CONFIG" --logo "$SHARE/astralabs-terminal.png" --logo-type kitty --logo-width 26
+else
+  exec fastfetch -c "$CONFIG" --logo "$SHARE/astralabs-logo.txt" --logo-type file \
+    --logo-color-1 "#ffffff" --logo-color-2 "#b6ff2e"
+fi

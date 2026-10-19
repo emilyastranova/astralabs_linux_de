@@ -1,0 +1,18 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Emily Astranova",
+                "Email": "emily@astralabs.dev"
+            }
+        ],
+        "Category": "",
+        "Description": "AstraLabs: carbon, bone and acid, with a dot field boot splash",
+        "Id": "dev.astralabs.desktop",
+        "License": "AGPL-3.0",
+        "Name": "AstraLabs",
+        "Website": "https://astralabs.dev"
+    },
+    "X-Plasma-APIVersion": "2"
+}
