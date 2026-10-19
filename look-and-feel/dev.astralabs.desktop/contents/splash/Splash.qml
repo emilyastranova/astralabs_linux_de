@@ -25,14 +25,42 @@ Rectangle {
     readonly property real lockupWidth: Math.round(Math.min(width * 0.3, height * 0.42))
     readonly property real lockupHeight: lockupWidth * 105 / 904.68
 
-    /* ---------- dot field ---------- */
+    // Ignition ring, 0 → 1. Ease in-out cubic: the slow start shows the ring being born at the centre.
+    property real fieldProgress: 0
+    NumberAnimation on fieldProgress {
+        id: ignite
+        running: false
+        from: 0; to: 1
+        duration: 1300
+        easing.type: Easing.InOutCubic
+    }
+
+    /* ---------- dot field, on the GPU ----------
+       A fragment shader draws every dot each frame, so the ring moves at the display's full
+       refresh rate. Source: shaders/field.frag, compiled by tools/build_shaders.sh. */
+    ShaderEffect {
+        id: fieldGpu
+        anchors.fill: parent
+        fragmentShader: "shaders/field.frag.qsb"
+        property vector2d res: Qt.vector2d(width, height)
+        property real progress: root.fieldProgress
+        property real pitch: 16
+        property real band: 22
+        property real still: root.still ? 1 : 0
+    }
+
+    /* ---------- dot field, CPU fallback ----------
+       Only used if the shader can't load. Draws the same picture with JavaScript, repainting
+       just the band the ring has moved through each frame. */
     Canvas {
         id: field
         anchors.fill: parent
+        // software rendering can't run shaders at all, so fall back there too
+        visible: fieldGpu.status === ShaderEffect.Error || fieldGpu.GraphicsInfo.api === GraphicsInfo.Software
         renderStrategy: Canvas.Cooperative
 
         readonly property int pitch: 16
-        property real progress: 0      // ignition ring, 0 → 1
+        readonly property real progress: root.fieldProgress
         property real lastR: -1
         property bool primed: false
 
@@ -49,8 +77,10 @@ Rectangle {
         onWidthChanged: { primed = false; lastR = -1; requestPaint(); }
         onHeightChanged: { primed = false; lastR = -1; requestPaint(); }
 
+        onVisibleChanged: { primed = false; lastR = -1; requestPaint(); }
+
         onPaint: {
-            if (width <= 0 || height <= 0) return;
+            if (!visible || width <= 0 || height <= 0) return;
             const ctx = getContext("2d");
             const cx = width / 2, cy = height / 2, max = reach();
             if (!primed) {
@@ -87,15 +117,7 @@ Rectangle {
             lastR = R;
         }
 
-        // Ease in-out cubic: the slow start shows the ring being born at the centre
-        NumberAnimation on progress {
-            id: ignite
-            running: false
-            from: 0; to: 1
-            duration: 1300
-            easing.type: Easing.InOutCubic
-        }
-        onProgressChanged: requestPaint()
+        onProgressChanged: if (visible) requestPaint()
     }
 
     /* ---------- lockup ---------- */

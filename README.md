@@ -90,6 +90,8 @@ The **Konsole profile** sets the AstraLabs colours, Martian Mono at 9pt with 2px
 
 The dot field holds unlit for a moment, then ignites from the centre of the screen in an Acid ring. The mark flickers on like a tube, the wordmark strobes on, and the registration marks set. The last frame matches the wallpaper exactly, so the desktop takes over without a jump. With animations turned off in System Settings, it shows the finished frame.
 
+The dot field is drawn by a fragment shader on the GPU, so the ring moves at your display's full refresh rate even while the session is still loading. If the shader can't run (software rendering, or a driver problem), a JavaScript Canvas draws the same picture instead. The flicker and strobes are hard cuts by design, so they look the same at any refresh rate.
+
 Preview it without logging out:
 
 ```bash
@@ -149,6 +151,12 @@ Regenerate the wallpapers (the lockup SVG is in the AstraLabs design repo under 
 
 ```bash
 python3 tools/render_wallpapers.py /path/to/astralabs-lockup.svg
+```
+
+Rebuild the splash shader after editing `look-and-feel/dev.astralabs.desktop/contents/splash/shaders/field.frag`. This needs `qsb` from `qt6-qtshadertools`; the compiled `field.frag.qsb` is committed, so installing doesn't:
+
+```bash
+tools/build_shaders.sh
 ```
 
 Regenerate the README images in `docs/images/`. The terminal shots use live fastfetch output and the splash GIF is captured from the real QML off screen, so this needs fastfetch and ksplashqml installed:
